@@ -39,5 +39,5 @@ int vfprintf(FILE * file, const char *format, va_list ap)
 		}
 	}
 
-	return fwrite(buffer, rv, 1, file);
+	return fwrite(buffer, 1, rv, file);
 }
