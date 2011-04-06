@@ -210,3 +210,16 @@ void free(void *ptr)
 	/* Merge into adjacent free blocks */
 	ah = __free_block(ah);
 }
+
+void get_malloc_memory_status(size_t *free_bytes, size_t *largest_block)
+{
+    *free_bytes = 0;
+    *largest_block = 0;
+    
+    for (fp = __malloc_head.next_free; fp->a.type != ARENA_TYPE_HEAD; fp = fp->next_free) {
+        *free_bytes += fp->a.size;
+        if (fp->a.size >= *largest_block) {
+            *largest_block = fp->a.size;
+        }
+    }
+}

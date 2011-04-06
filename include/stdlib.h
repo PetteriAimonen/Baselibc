@@ -9,8 +9,6 @@
 #include <klibc/inline.h>
 #include <stddef.h>
 
-#include <malloc.h>
-
 __extern_inline int abs(int __n)
 {
 	return (__n < 0) ? -__n : __n;
@@ -29,6 +27,13 @@ __extern_inline long long llabs(long long __n)
 {
 	return (__n < 0LL) ? -__n : __n;
 }
+
+__extern void free(void *);
+__extern void *malloc(size_t);
+__extern void *calloc(size_t, size_t);
+__extern void *realloc(void *, size_t);
+__extern void add_malloc_block(void *, size_t);
+__extern void get_malloc_memory_status(size_t *, size_t *)
 
 __extern long strtol(const char *, char **, int);
 __extern long long strtoll(const char *, char **, int);
