@@ -1,9 +1,8 @@
-CC      = arm-none-eabi-gcc
 CFLAGS  = -fno-common -Os -g -Wall -Werror -I include
 
 # Platform specific settings
+CC      = arm-none-eabi-gcc
 CFLAGS += -mcpu=cortex-m3 -mthumb
-GLUE = glue_stm32.o
 
 FILES   = src/asprintf.o	src/atoi.o	src/atol.o \
 	src/atoll.o	src/bsearch.o	src/bzero.o \

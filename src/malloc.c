@@ -213,6 +213,7 @@ void free(void *ptr)
 
 void get_malloc_memory_status(size_t *free_bytes, size_t *largest_block)
 {
+    struct free_arena_header *fp;
     *free_bytes = 0;
     *largest_block = 0;
     
