@@ -8,6 +8,7 @@
 #include <klibc/extern.h>
 #include <klibc/inline.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 __extern_inline int abs(int __n)
 {
@@ -32,8 +33,18 @@ __extern void free(void *);
 __extern void *malloc(size_t);
 __extern void *calloc(size_t, size_t);
 __extern void *realloc(void *, size_t);
+
+/* Giving malloc some memory from which to allocate */
 __extern void add_malloc_block(void *, size_t);
 __extern void get_malloc_memory_status(size_t *, size_t *);
+
+/* Malloc locking
+ * Until the callbacks are set, malloc doesn't do any locking.
+ * malloc_lock() *may* timeout, in which case malloc() will return NULL.
+ */
+typedef bool (*malloc_lock_t)();
+typedef void (*malloc_unlock_t)();
+__extern void set_malloc_locking(malloc_lock_t, malloc_unlock_t);
 
 __extern long strtol(const char *, char **, int);
 __extern long long strtoll(const char *, char **, int);

@@ -43,13 +43,23 @@ static inline int fileno(FILE * __f)
 #define stderr __create_file(2)
 
 /* These are implemented in glue */
-__extern size_t fread(void *, size_t, size_t, FILE *);
-__extern size_t fwrite(const void *, size_t, size_t, FILE *);
+__extern size_t _fread(void *, size_t, FILE *);
+__extern size_t _fwrite(const void *, size_t, FILE *);
 
-/* Wrappers around fread and fwrite */
+/* Wrappers around _fread and _fwrite */
+__extern_inline size_t fread(void *buf, size_t size, size_t nmemb, FILE *stream)
+{
+	return _fread(buf, size*nmemb, stream) / size;
+}
+
+__extern_inline size_t fwrite(const void *buf, size_t size, size_t nmemb, FILE *stream)
+{
+	return _fwrite(buf, size*nmemb, stream) / size;
+}
+
 __extern_inline int fputs(const char *s, FILE *f)
 {
-	return fwrite(s, strlen(s), 1, f);
+	return fwrite(s, 1, strlen(s), f);
 }
 
 __extern_inline int fputc(int c, FILE *f)
@@ -57,7 +67,6 @@ __extern_inline int fputc(int c, FILE *f)
 	unsigned char ch = c;
 	return fwrite(&ch, 1, 1, f) == 1 ? ch : EOF;
 }
-
 
 __extern char *fgets(char *, int, FILE *);
 __extern_inline int fgetc(FILE *f)
