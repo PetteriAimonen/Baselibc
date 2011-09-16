@@ -336,7 +336,7 @@ static void buf_putp(void *p, char c)
 {
     struct buf_putp_state* state = p;
     
-    if (state->written >= state->buflen - 1)
+    if (state->written + 1 >= state->buflen)
     {
         state->written++; // Just count the chars
     }
