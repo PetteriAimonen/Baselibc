@@ -178,7 +178,7 @@ static void putchw(void *putp, putcf putf, struct param *p)
         putf(putp, ch);
 }
 
-static void tfp_format(void *putp, putcf putf, const char *fmt, va_list va)
+void tfp_format(void *putp, putcf putf, const char *fmt, va_list va)
 {
     struct param p;
 #ifdef PRINTF_LONG_SUPPORT
