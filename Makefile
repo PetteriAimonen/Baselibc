@@ -1,4 +1,4 @@
-CFLAGS  = -fno-common -Os -g -Wall -Werror -I include
+CFLAGS  = -fno-common -O2 -g -Wall -Werror -I include
 
 # Platform specific settings
 CC      = arm-none-eabi-gcc
@@ -11,8 +11,8 @@ FILES   = src/asprintf.o	src/atoi.o	src/atol.o \
 	src/jrand48.o	src/lrand48.o	src/malloc.o	src/memccpy.o \
 	src/memchr.o	src/memcmp.o	src/memcpy.o	src/memmem.o \
 	src/memmove.o	src/memrchr.o	src/memset.o	src/memswap.o \
-	src/mrand48.o	src/nrand48.o	src/printf.o	src/qsort.o \
-	src/realloc.o	src/snprintf.o	src/sprintf.o \
+	src/mrand48.o	src/nrand48.o	src/qsort.o \
+	src/realloc.o  \
 	src/srand48.o	src/sscanf.o	src/strcasecmp.o \
 	src/strcat.o	src/strchr.o	src/strcmp.o	src/strcpy.o \
 	src/strcspn.o	src/strdup.o	src/strlcat.o \
@@ -26,7 +26,8 @@ FILES   = src/asprintf.o	src/atoi.o	src/atol.o \
 
 # For proper printf
 #FILES += src/fprintf.o src/vasprintf.o	src/vfprintf.o	src/vprintf.o \
-#	src/vsnprintf.o	src/vsprintf.o	src/vsscanf.o
+#	src/vsnprintf.o	src/vsprintf.o	src/vsscanf.o src/snprintf.o \
+#       src/printf.o
 
 # For tiny printf
 FILES += src/tinyprintf.o

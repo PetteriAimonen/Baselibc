@@ -46,4 +46,16 @@ __extern char *strstr(const char *, const char *);
 __extern char *strtok(char *, const char *);
 __extern char *strtok_r(char *, const char *, char **);
 
+/* Some dummy functions to avoid errors with C++ cstring */
+inline static int strcoll(const char *s1, const char *s2)
+{
+	return strcmp(s1, s2);
+}
+
+inline static size_t strxfrm(char *dest, const char *src, size_t n)
+{
+	strncpy(dest, src, n);
+	return strlen(src);
+}
+
 #endif				/* _STRING_H */
