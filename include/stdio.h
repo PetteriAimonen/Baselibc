@@ -62,6 +62,11 @@ __extern_inline int fputs(const char *s, FILE *f)
 	return fwrite(s, 1, strlen(s), f);
 }
 
+__extern_inline int puts(const char *s)
+{
+	return fwrite(s, 1, strlen(s), stdout) + fwrite("\n", 1, 1, stdout);
+}
+
 __extern_inline int fputc(int c, FILE *f)
 {
 	unsigned char ch = c;
