@@ -1,4 +1,4 @@
-CFLAGS  = -fno-common -O2 -g -Wall -Werror -I include
+CFLAGS  = -fno-common -Os -g -Wall -Werror -I include
 
 # Platform specific settings
 CC      = arm-none-eabi-gcc
@@ -6,7 +6,7 @@ CFLAGS += -mcpu=cortex-m3 -mthumb
 
 FILES   = src/asprintf.o	src/atoi.o	src/atol.o \
 	src/atoll.o	src/bsearch.o	src/bzero.o \
-	src/calloc.o	src/ctypes.o	src/fgets.o \
+	src/calloc.o	src/fgets.o \
 	src/inline.o \
 	src/jrand48.o	src/lrand48.o	src/malloc.o	src/memccpy.o \
 	src/memchr.o	src/memcmp.o	src/memcpy.o	src/memmem.o \
