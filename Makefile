@@ -2,7 +2,12 @@ CFLAGS  = -fno-common -Os -g -Wall -Werror -I include
 
 # Platform specific settings
 CC      = arm-none-eabi-gcc
+AR      = arm-none-eabi-ar
 CFLAGS += -mcpu=cortex-m3 -mthumb
+
+ifdef windir
+RM = del
+endif
 
 FILES   = src/asprintf.o	src/atoi.o	src/atol.o \
 	src/atoll.o	src/bsearch.o	src/bzero.o \
@@ -36,11 +41,11 @@ FILES += src/tinyprintf.o
 all: libc.a
 
 clean:
-	rm -f $(FILES) libc.a
+	$(RM) $(FILES) libc.a
 
 libc.a: $(FILES)
-	rm -f $@
-	ar ru $@ $^
+	$(RM) $@
+	$(AR) ru $@ $^
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
