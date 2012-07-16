@@ -30,8 +30,6 @@ __extern char *strcpy(char *, const char *);
 __extern size_t strcspn(const char *, const char *);
 __extern char *strdup(const char *);
 __extern char *strndup(const char *, size_t);
-__extern char *strerror(int);
-__extern char *strsignal(int);
 __extern size_t strlen(const char *);
 __extern size_t strnlen(const char *, size_t);
 __extern char *strncat(char *, const char *, size_t);
