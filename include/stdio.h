@@ -11,50 +11,42 @@
 #include <stddef.h>
 #include <string.h>
 
-/* This structure doesn't necessarily exist, but it gives us something
-   to define FILE * with */
-struct File;
+/* The File structure is designed to be compatible with ChibiOS/RT type
+ * BaseSequentialStream.
+ */
+struct File_methods
+{
+    size_t (*write)(void *instance, const char *bp, size_t n);
+    size_t (*read)(void *instance, char *bp, size_t n);
+};
+
+struct File
+{
+    const struct File_methods *vmt;
+};
+
 typedef struct File FILE;
 
 #ifndef EOF
 # define EOF (-1)
 #endif
 
-/*
- * Convert between a FILE * and a file descriptor.  We don't actually
- * have any in-memory data, so we just abuse the pointer itself to
- * hold the data.  Note, however, that for file descriptors, -1 is
- * error and 0 is a valid value; for FILE *, NULL (0) is error and
- * non-NULL are valid.
- */
-static inline int fileno(FILE * __f)
-{
-	/* This should really be intptr_t, but size_t should be the same size */
-	return (int)(size_t) __f - 1;
-}
-
-/* This is a macro so it can be used as initializer */
-#define __create_file(__fd) ((FILE *)(size_t)((__fd) + 1))
-
-/* Standard file descriptors - feel free to invent more for your own purposes
-   as long as they don't clash with valid FILE * pointers. */
-#define stdin  __create_file(0)
-#define stdout __create_file(1)
-#define stderr __create_file(2)
-
-/* These are implemented in glue */
-__extern size_t _fread(void *, size_t, FILE *);
-__extern size_t _fwrite(const void *, size_t, FILE *);
+/* Standard file descriptors - implement these globals yourself. */
+extern FILE* const stdin;
+extern FILE* const stdout;
+extern FILE* const stderr;
 
 /* Wrappers around _fread and _fwrite */
 __extern_inline size_t fread(void *buf, size_t size, size_t nmemb, FILE *stream)
 {
-	return _fread(buf, size*nmemb, stream) / size;
+    if (stream->vmt->read == NULL) return 0;
+    return stream->vmt->read(stream, buf, size*nmemb) / size;
 }
 
 __extern_inline size_t fwrite(const void *buf, size_t size, size_t nmemb, FILE *stream)
 {
-	return _fwrite(buf, size*nmemb, stream) / size;
+    if (stream->vmt->write == NULL) return 0;
+    return stream->vmt->write(stream, buf, size*nmemb) / size;
 }
 
 __extern_inline int fputs(const char *s, FILE *f)
@@ -98,5 +90,18 @@ __extern int vasprintf(char **, const char *, va_list);
 
 __extern int sscanf(const char *, const char *, ...);
 __extern int vsscanf(const char *, const char *, va_list);
+
+/* Open a memory buffer for writing.
+ Note: Does not write null terminator.*/
+struct MemFile
+{
+    struct File file;
+    char *buffer;
+    size_t bytes_written;
+    size_t size;
+};
+
+FILE *fmemopen_w(struct MemFile* storage, char *buffer, size_t size);
+
 
 #endif				/* _STDIO_H */

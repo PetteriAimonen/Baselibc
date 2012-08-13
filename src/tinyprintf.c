@@ -62,8 +62,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdio.h>
 
-typedef void (*putcf) (void *, char);
-
 struct param {
     int width; /**< field width */
     char lz;            /**< Leading zeros */
@@ -161,8 +159,17 @@ static char a2i(char ch, const char **src, int base, int *nump)
     return ch;
 }
 
-static void putchw(void *putp, putcf putf, struct param *p)
+static int putf(FILE *putp, char c)
 {
+    if (fputc(c, putp) == EOF)
+        return 0;
+    else
+        return 1;
+}
+
+static unsigned putchw(FILE *putp, struct param *p)
+{
+    unsigned written = 0;
     char ch;
     int n = p->width;
     char *bf = p->bf;
@@ -180,35 +187,38 @@ static void putchw(void *putp, putcf putf, struct param *p)
     /* Fill with space, before alternate or sign */
     if (!p->lz) {
         while (n-- > 0)
-            putf(putp, ' ');
+            written += putf(putp, ' ');
     }
 
     /* print sign */
     if (p->sign)
-        putf(putp, p->sign);
+        written += putf(putp, p->sign);
 
     /* Alternate */
     if (p->alt && p->base == 16) {
-        putf(putp, '0');
-        putf(putp, (p->uc ? 'X' : 'x'));
+        written += putf(putp, '0');
+        written += putf(putp, (p->uc ? 'X' : 'x'));
     } else if (p->alt && p->base == 8) {
-        putf(putp, '0');
+        written += putf(putp, '0');
     }
 
     /* Fill with zeros, after alternate or sign */
     if (p->lz) {
         while (n-- > 0)
-            putf(putp, '0');
+            written += putf(putp, '0');
     }
 
     /* Put actual buffer */
     bf = p->bf;
     while ((ch = *bf++))
-        putf(putp, ch);
+        written += putf(putp, ch);
+    
+    return written;
 }
 
-void tfp_format(void *putp, putcf putf, const char *fmt, va_list va)
+size_t tfp_format(FILE *putp, const char *fmt, va_list va)
 {
+    size_t written = 0;
     struct param p;
 #ifdef PRINTF_LONG_SUPPORT
     char bf[23];
@@ -221,7 +231,7 @@ void tfp_format(void *putp, putcf putf, const char *fmt, va_list va)
 
     while ((ch = *(fmt++))) {
         if (ch != '%') {
-            putf(putp, ch);
+            written += putf(putp, ch);
         } else {
             /* Init parameter struct */
             p.lz = 0;
@@ -269,7 +279,7 @@ void tfp_format(void *putp, putcf putf, const char *fmt, va_list va)
                 else
 #endif
                     ui2a(va_arg(va, unsigned int), &p);
-                putchw(putp, putf, &p);
+                written += putchw(putp, &p);
                 break;
             case 'd':
             case 'i':
@@ -280,7 +290,7 @@ void tfp_format(void *putp, putcf putf, const char *fmt, va_list va)
                 else
 #endif
                     i2a(va_arg(va, int), &p);
-                putchw(putp, putf, &p);
+                written += putchw(putp, &p);
                 break;
             case 'x':
             case 'X':
@@ -292,49 +302,36 @@ void tfp_format(void *putp, putcf putf, const char *fmt, va_list va)
                 else
 #endif
                     ui2a(va_arg(va, unsigned int), &p);
-                putchw(putp, putf, &p);
+                written += putchw(putp, &p);
                 break;
             case 'o':
                 p.base = 8;
                 ui2a(va_arg(va, unsigned int), &p);
-                putchw(putp, putf, &p);
+                written += putchw(putp, &p);
                 break;
             case 'c':
-                putf(putp, (char)(va_arg(va, int)));
+                written += putf(putp, (char)(va_arg(va, int)));
                 break;
             case 's':
                 p.bf = va_arg(va, char *);
-                putchw(putp, putf, &p);
+                written += putchw(putp, &p);
                 p.bf = bf;
                 break;
             case '%':
-                putf(putp, ch);
+                written += putf(putp, ch);
             default:
                 break;
             }
         }
     }
  abort:;
-}
-
-// Output to FILE* through fputc
-struct file_putp_state {
-    FILE *file;
-    size_t written;
-};
-
-static void file_putp(void *p, char c)
-{
-    struct file_putp_state* state = p;
-    fputc(c, state->file);
-    state->written++;
+ 
+ return written;
 }
 
 int vfprintf(FILE *f, const char *fmt, va_list va)
 {
-    struct file_putp_state state = {f, 0};
-    tfp_format(&state, file_putp, fmt, va);
-    return state.written;
+    return tfp_format(f, fmt, va);
 }
 
 int fprintf(FILE *f, const char *fmt, ...)
@@ -355,34 +352,13 @@ int printf(const char *fmt, ...)
     return rv;
 }
 
-// Output to buffer, with bounds checking
-struct buf_putp_state {
-    char *buffer;
-    size_t written;
-    size_t buflen;
-};
-
-static void buf_putp(void *p, char c)
-{
-    struct buf_putp_state* state = p;
-    
-    if (state->written + 1 >= state->buflen)
-    {
-        state->written++; // Just count the chars
-    }
-    else
-    {
-        state->written++;
-        *(state->buffer++) = c;
-    }
-}
-
 int vsnprintf(char *str, size_t size, const char *fmt, va_list va)
 {
-    struct buf_putp_state state = {str, 0, size};
-    tfp_format(&state, buf_putp, fmt, va);
+    struct MemFile state;
+    FILE *f = fmemopen_w(&state, str, size - 1);
+    tfp_format(f, fmt, va);
     *(state.buffer) = '\0';
-    return state.written;
+    return state.bytes_written;
 }
 
 int snprintf(char *str, size_t size, const char *fmt, ...)

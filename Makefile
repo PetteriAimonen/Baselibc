@@ -1,7 +1,9 @@
 # You can override the CFLAGS and C compiler externally,
 # e.g. make PLATFORM=cortex-m3
+CFLAGS += -Wall -Werror -I include
+
 ifeq ($(PLATFORM),cortex-m3)
-  CFLAGS  = -fno-common -Os -g -Wall -Werror -I include
+  CFLAGS  += -fno-common -Os -g
   CC      = arm-none-eabi-gcc
   AR      = arm-none-eabi-ar
   CFLAGS += -mcpu=cortex-m3 -mthumb
