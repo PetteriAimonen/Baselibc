@@ -93,6 +93,7 @@ int vsscanf(const char *buffer, const char *format, va_list ap)
 	unsigned long matchmap[((1 << CHAR_BIT) + (LONG_BIT - 1)) / LONG_BIT];
 	int matchinv = 0;	/* Is match map inverted? */
 	unsigned char range_start = 0;
+	(void)sign;
 
 	while ((ch = *p++) && !bail) {
 		switch (state) {

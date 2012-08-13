@@ -1,49 +1,31 @@
-CFLAGS  = -fno-common -Os -g -Wall -Werror -I include
-
-# Platform specific settings
-CC      = arm-none-eabi-gcc
-AR      = arm-none-eabi-ar
-CFLAGS += -mcpu=cortex-m3 -mthumb
-
-ifdef windir
-RM = del
+# You can override the CFLAGS and C compiler externally,
+# e.g. make PLATFORM=cortex-m3
+ifeq ($(PLATFORM),cortex-m3)
+  CFLAGS  = -fno-common -Os -g -Wall -Werror -I include
+  CC      = arm-none-eabi-gcc
+  AR      = arm-none-eabi-ar
+  CFLAGS += -mcpu=cortex-m3 -mthumb
 endif
 
-FILES   = src/asprintf.o	src/atoi.o	src/atol.o \
-	src/atoll.o	src/bsearch.o	src/bzero.o \
-	src/calloc.o	src/fgets.o \
-	src/inline.o \
-	src/jrand48.o	src/lrand48.o	src/malloc.o	src/memccpy.o \
-	src/memchr.o	src/memcmp.o	src/memcpy.o	src/memmem.o \
-	src/memmove.o	src/memrchr.o	src/memset.o	src/memswap.o \
-	src/mrand48.o	src/nrand48.o	src/qsort.o \
-	src/realloc.o  \
-	src/srand48.o	src/sscanf.o	src/strcasecmp.o \
-	src/strcat.o	src/strchr.o	src/strcmp.o	src/strcpy.o \
-	src/strcspn.o	src/strdup.o	src/strlcat.o \
-	src/strlcpy.o	src/strlen.o	src/strncasecmp.o	src/strncat.o \
-	src/strncmp.o	src/strncpy.o	src/strndup.o	src/strnlen.o \
-	src/strntoimax.o	src/strntoumax.o	src/strpbrk.o \
-	src/strrchr.o	src/strsep.o	src/strspn.o	src/strstr.o \
-	src/strtoimax.o	src/strtok.o	src/strtok_r.o	src/strtol.o \
-	src/strtoll.o	src/strtoul.o	src/strtoull.o \
-	src/strtoumax.o
+# With this, the makefile should work on Windows also.
+ifdef windir
+  RM = del
+endif
 
-# For proper printf
-#FILES += src/fprintf.o src/vasprintf.o	src/vfprintf.o	src/vprintf.o \
-#	src/vsnprintf.o	src/vsprintf.o	src/vsscanf.o src/snprintf.o \
-#       src/printf.o
+# Just include all the source files in the build.
+CSRC = $(wildcard src/*.c)
+OBJS = $(CSRC:.c=.o)
 
-# For tiny printf
-FILES += src/tinyprintf.o
-
+# Some of the files uses "templates", i.e. common pieces
+# of code included from multiple files.
+CFLAGS += -Isrc/templates
 
 all: libc.a
 
 clean:
-	$(RM) $(FILES) libc.a
+	$(RM) $(OBJS) libc.a
 
-libc.a: $(FILES)
+libc.a: $(OBJS)
 	$(RM) $@
 	$(AR) ru $@ $^
 
