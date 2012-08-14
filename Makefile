@@ -1,9 +1,9 @@
 # You can override the CFLAGS and C compiler externally,
 # e.g. make PLATFORM=cortex-m3
-CFLAGS += -Wall -Werror -I include
+CFLAGS += -g -Wall -Werror -I include
 
 ifeq ($(PLATFORM),cortex-m3)
-  CFLAGS  += -fno-common -Os -g
+  CFLAGS  += -fno-common -Os
   CC      = arm-none-eabi-gcc
   AR      = arm-none-eabi-ar
   CFLAGS += -mcpu=cortex-m3 -mthumb
@@ -18,6 +18,10 @@ endif
 CSRC = $(wildcard src/*.c)
 OBJS = $(CSRC:.c=.o)
 
+# And the files for the test suite
+TESTS_CSRC = $(wildcard tests/*_tests.c)
+TESTS_OBJS = $(TESTS_CSRC:.c=)
+
 # Some of the files uses "templates", i.e. common pieces
 # of code included from multiple files.
 CFLAGS += -Isrc/templates
@@ -25,11 +29,17 @@ CFLAGS += -Isrc/templates
 all: libc.a
 
 clean:
-	$(RM) $(OBJS) libc.a
+	$(RM) $(OBJS) $(TESTS_OBJS) libc.a
 
 libc.a: $(OBJS)
 	$(RM) $@
 	$(AR) ru $@ $^
+
+run_tests: $(TESTS_OBJS)
+	$(foreach f,$^,$f)
+
+tests/%: tests/%.c tests/tests_glue.c libc.a
+	$(CC) $(CFLAGS) -o $@ $^
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<

@@ -14,18 +14,20 @@
 /* The File structure is designed to be compatible with ChibiOS/RT type
  * BaseSequentialStream.
  */
+struct File;
+
+typedef struct File FILE;
+
 struct File_methods
 {
-    size_t (*write)(void *instance, const char *bp, size_t n);
-    size_t (*read)(void *instance, char *bp, size_t n);
+    size_t (*write)(FILE* instance, const char *bp, size_t n);
+    size_t (*read)(FILE* instance, char *bp, size_t n);
 };
 
 struct File
 {
     const struct File_methods *vmt;
 };
-
-typedef struct File FILE;
 
 #ifndef EOF
 # define EOF (-1)

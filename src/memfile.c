@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-size_t memfile_write(void *instance, const char *bp, size_t n)
+size_t memfile_write(FILE *instance, const char *bp, size_t n)
 {
     struct MemFile *f = (struct MemFile*)instance;
     size_t i = 0;
@@ -8,7 +8,7 @@ size_t memfile_write(void *instance, const char *bp, size_t n)
     while (n--)
     {
         f->bytes_written++;
-        if (f->bytes_written < f->size)
+        if (f->bytes_written <= f->size)
         {
             *f->buffer++ = *bp++;
             i++;
