@@ -38,7 +38,7 @@ extern FILE* const stdin;
 extern FILE* const stdout;
 extern FILE* const stderr;
 
-/* Wrappers around _fread and _fwrite */
+/* Wrappers around stream write and read */
 __extern_inline size_t fread(void *buf, size_t size, size_t nmemb, FILE *stream)
 {
     if (stream->vmt->read == NULL) return 0;
