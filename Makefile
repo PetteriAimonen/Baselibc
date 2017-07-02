@@ -8,6 +8,12 @@ ifeq ($(PLATFORM),cortex-m3)
   CFLAGS += -mcpu=cortex-m3 -mthumb
   CFLAGS += -fno-common -Os
   CFLAGS += -ffunction-sections -fdata-sections
+else ifeq ($(PLATFORM),cortex-m0)
+  CC      = arm-none-eabi-gcc
+  AR      = arm-none-eabi-ar
+  CFLAGS += -mcpu=cortex-m0 -mthumb
+  CFLAGS += -fno-common -Os
+  CFLAGS += -ffunction-sections -fdata-sections
 endif
 
 # With this, the makefile should work on Windows also.
