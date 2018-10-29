@@ -42,8 +42,8 @@ __extern void get_malloc_memory_status(size_t *, size_t *);
  * Until the callbacks are set, malloc doesn't do any locking.
  * malloc_lock() *may* timeout, in which case malloc() will return NULL.
  */
-typedef bool (*malloc_lock_t)();
-typedef void (*malloc_unlock_t)();
+typedef bool (*malloc_lock_t)(void);
+typedef void (*malloc_unlock_t)(void);
 __extern void set_malloc_locking(malloc_lock_t, malloc_unlock_t);
 
 __extern long strtol(const char *, char **, int);

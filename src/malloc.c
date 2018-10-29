@@ -23,8 +23,8 @@ static struct free_arena_header __malloc_head = {
 	&__malloc_head
 };
 
-static bool malloc_lock_nop() {return true;}
-static void malloc_unlock_nop() {}
+static bool malloc_lock_nop(void) {return true;}
+static void malloc_unlock_nop(void) {}
 
 static malloc_lock_t malloc_lock = &malloc_lock_nop;
 static malloc_unlock_t malloc_unlock = &malloc_unlock_nop;
