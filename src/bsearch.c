@@ -9,14 +9,14 @@ void *bsearch(const void *key, const void *base, size_t nmemb,
 {
 	while (nmemb) {
 		size_t mididx = nmemb / 2;
-		const void *midobj = base + mididx * size;
+		const void *midobj = (const char*)base + mididx * size;
 		int diff = cmp(key, midobj);
 
 		if (diff == 0)
 			return (void *)midobj;
 
 		if (diff > 0) {
-			base = midobj + size;
+			base = (const char*)midobj + size;
 			nmemb -= mididx + 1;
 		} else
 			nmemb = mididx;
