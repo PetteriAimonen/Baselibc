@@ -14,6 +14,14 @@ else ifeq ($(PLATFORM),cortex-m0)
   CFLAGS += -mcpu=cortex-m0 -mthumb
   CFLAGS += -fno-common -Os
   CFLAGS += -ffunction-sections -fdata-sections
+else ifeq ($(PLATFORM),m68k-elf)
+  CC      = m68k-elf-gcc
+  AR      = m68k-elf-ar
+  CFLAGS += -mcpu=68000
+  CFLAGS += -fno-common -Os
+  CFLAGS += -ffunction-sections -fdata-sections
+  CFLAGS += -ffreestanding
+  CFLAGS += -DNO_UNISTD_H
 endif
 
 # With this, the makefile should work on Windows also.
