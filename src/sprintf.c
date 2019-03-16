@@ -4,7 +4,9 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#ifndef NO_UNISTD_H
 #include <unistd.h>
+#endif
 
 int sprintf(char *buffer, const char *format, ...)
 {
