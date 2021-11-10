@@ -22,6 +22,10 @@ else ifeq ($(PLATFORM),m68k-elf)
   CFLAGS += -ffunction-sections -fdata-sections
   CFLAGS += -ffreestanding
   CFLAGS += -DNO_UNISTD_H
+else ifeq ($(PLATFORM),pic32mm)
+  CC      = xc32-gcc
+  AR      = xc32-ar
+  CFLAGS += -g -x c -c -mprocessor=32MM0256GPM064
 endif
 
 # With this, the makefile should work on Windows also.
